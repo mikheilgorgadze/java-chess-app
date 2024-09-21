@@ -26,10 +26,14 @@ public class ChessBoard extends JPanel {
 
     private final String[] initialFen = generateFenArrayFromString(Config.getInitialFEN());
 
-    // Chess board setup
     public ChessBoard() {
         loadChessPieces();
     }
+
+    /**
+     * This method draws all the chess components including board and pieces
+     * @param g the <code>Graphics</code> object
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -37,6 +41,9 @@ public class ChessBoard extends JPanel {
         drawPiecesFromFEN(initialFen, g);
     }
 
+    /**
+     * Initializes chessPieceToImage HashMap. Each piece will have it's corresponding image
+     */
     private void loadChessPieces() {
         for (ChessPiece piece : chessPieces) {
             String pieceName = piece.getPieceColor().name().toLowerCase() + "-" + piece.getPieceName();
@@ -45,10 +52,19 @@ public class ChessBoard extends JPanel {
         }
     }
 
+    /**
+     *
+     * @param chessPiece ChessPiece object instance
+     * @return ChessPiece's corresponding image is returned from chessPieceToImage HashMap
+     */
     private BufferedImage getChessPieceImage(ChessPiece chessPiece) {
         return chessPieceToImage.get(chessPiece);
     }
-    // Draw empty chess board
+
+    /**
+     *
+     * @param g Graphics class instance, so function is able to graphically draw chess board
+     */
     private void drawBoard(Graphics g) {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
@@ -60,6 +76,11 @@ public class ChessBoard extends JPanel {
         }
     }
 
+    /**
+     * This function draws chess pieces on board from corresponding FEN notation
+     * @param fenArr String array of FEN notation
+     * @param g Graphics class instance to draw chess pieces
+     */
     public void drawPiecesFromFEN(String[] fenArr, Graphics g) {
         if (fenArr == null || fenArr.length == 0) {
             return;
@@ -86,6 +107,15 @@ public class ChessBoard extends JPanel {
         }
     }
 
+
+    /**
+     *
+     * @param fen String of FEN notation
+     * @return returns String array representation of FEN notation
+     * In standard FEN notation, number of empty squares on board is represented by numeric value.
+     * For my app's purposes, this numeric value is "translated" into 0s. For example, if FEN contains 8, returned array
+     * will contain 8 zeroes instead.
+     */
     private String[] generateFenArrayFromString(String fen) {
         String [] fenArr = fen.split("/");
         for (int i = 0; i < fenArr.length; i++) {
