@@ -1,5 +1,6 @@
 package org.chess.utils;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -39,5 +40,22 @@ public class Config {
     }
     public static String getInitialFEN() {
         return properties.getProperty("initial_fen");
+    }
+
+    public static Color getDarkColor() {
+        try {
+            return Color.decode(properties.getProperty("dark_color"));
+        } catch (Exception e) {
+            return Color.GRAY;
+        }
+    }
+
+
+    public static Color getLightColor() {
+        try {
+            return Color.decode(properties.getProperty("light_color"));
+        } catch (Exception e) {
+            return Color.WHITE;
+        }
     }
 }

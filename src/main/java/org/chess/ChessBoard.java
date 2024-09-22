@@ -37,7 +37,7 @@ public class ChessBoard extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        drawBoard(g);
+        drawBoard(g, Config.getLightColor(), Config.getDarkColor());
         drawPiecesFromFEN(initialFen, g);
     }
 
@@ -65,12 +65,12 @@ public class ChessBoard extends JPanel {
      *
      * @param g Graphics class instance, so function is able to graphically draw chess board
      */
-    private void drawBoard(Graphics g) {
+    private void drawBoard(Graphics g, Color light, Color dark) {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 int x = col * SQUARE_SIZE;
                 int y = row * SQUARE_SIZE;
-                g.setColor((row + col) % 2 == 0 ? Color.WHITE : Color.GRAY);
+                g.setColor((row + col) % 2 == 0 ? light : dark);
                 g.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
             }
         }
