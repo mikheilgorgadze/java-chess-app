@@ -1,6 +1,6 @@
 package org.chess.utils;
 
-import org.chess.exceptions.Exception;
+import org.chess.exceptions.ChessException;
 import org.chess.exceptions.PositionException;
 
 public class Position {
@@ -11,7 +11,7 @@ public class Position {
 
     public Position(int row, int col) {
         if (row < min_row_col || row > max_row_col || col < min_row_col || col > max_row_col) {
-            throw new PositionException(Exception.POSITION_OUT_OF_BOUNDS);
+            throw new PositionException(ChessException.POSITION_OUT_OF_BOUNDS);
         }
         this.col = col;
         this.row = row;
@@ -23,7 +23,7 @@ public class Position {
 
     public void setRow(int row) {
         if (row < min_row_col || row > max_row_col) {
-            throw new PositionException(Exception.ROW_OUT_OF_BOUNDS);
+            throw new PositionException(ChessException.ROW_OUT_OF_BOUNDS);
         }
         this.row = row;
     }
@@ -34,13 +34,13 @@ public class Position {
 
     public void setCol(int col) {
         if (col < min_row_col || col > max_row_col) {
-            throw new PositionException(Exception.COlUMN_OUT_OF_BOUNDS);
+            throw new PositionException(ChessException.COlUMN_OUT_OF_BOUNDS);
         }
         this.col = col;
     }
 
     @Override
     public String toString() {
-        return Character.toString(('a' - 1 + col)) + row;
+        return Character.toString(('a' - 1 + col)) + (Config.getBoardSize() - row + 1);
     }
 }

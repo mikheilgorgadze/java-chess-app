@@ -1,17 +1,21 @@
 package org.chess;
 
+import org.chess.exceptions.ChessException;
 import org.chess.pieces.*;
-import org.chess.utils.Config;
-import org.chess.utils.PieceColor;
-import org.chess.utils.ResourceManager;
+import org.chess.utils.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ChessBoard extends JPanel {
     private final HashMap<ChessPiece, BufferedImage> chessPieceToImage = new HashMap<>();
+
+    private final ArrayList<ChessPiece> chessBoard = new ArrayList<>();
 
     private final ChessPiece[] chessPieces = {
             new Pawn(PieceColor.WHITE), new Pawn(PieceColor.BLACK),
@@ -24,10 +28,18 @@ public class ChessBoard extends JPanel {
     private static final int BOARD_SIZE = Config.getBoardSize();
     private static final int SQUARE_SIZE = Config.getSquareSize();
 
-    private final String[] initialFen = generateFenArrayFromString(Config.getInitialFEN());
-
     public ChessBoard() {
         loadChessPieces();
+        addMouseListener(new ChessBoardMouseListener());
+        fillChessBoardArrayFromFEN(Config.getInitialFEN());
+    }
+
+    private class ChessBoardMouseListener extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            int col = e.getX() / BOARD_SIZE;
+            int row = e.getY() / BOARD_SIZE;
+        }
     }
 
     /**
@@ -38,7 +50,39 @@ public class ChessBoard extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawBoard(g, Config.getLightColor(), Config.getDarkColor());
-        drawPiecesFromFEN(initialFen, g);
+        drawPieces(g);
+
+    }
+
+
+    private void fillChessBoardArrayFromFEN(String fen) {
+        if (fen == null || fen.isEmpty() ) {
+            throw new IllegalArgumentException("Argument should not be null");
+        }
+        int pieceCount = 0;
+        for (char c : fen.toCharArray()) {
+            if (Fen.isCorrectFenSymbol(c)){
+                int row = pieceCount / BOARD_SIZE;
+                int col = pieceCount % BOARD_SIZE;
+                for (ChessPiece chessPiece : chessPieces) {
+                    PieceColor pieceColor = Character.isUpperCase(c) ? PieceColor.WHITE : PieceColor.BLACK;
+                    if (chessPiece.getPieceName().equals(ChessPieceType.fromFenChar(c).pieceName) &&
+                    chessPiece.getPieceColor().equals(pieceColor)
+                    ) {
+                        chessPiece.setPosition(new Position(row + 1, col + 1));
+                        chessBoard.add(chessPiece);
+                        pieceCount ++;
+                    }
+                }
+            } else if (Character.isDigit(c)) {
+                for (int i = 0; i < Integer.parseInt(Character.toString(c)); i++) {
+                    chessBoard.add(null);
+                    pieceCount ++;
+                }
+            } else if (c != '/') {
+                throw new RuntimeException(ChessException.ILLEGAL_FEN_SYMBOL.message);
+            }
+        }
     }
 
     /**
@@ -77,62 +121,21 @@ public class ChessBoard extends JPanel {
     }
 
     /**
-     * This function draws chess pieces on board from corresponding FEN notation
-     * @param fenArr String array of FEN notation
+     * This function draws chess pieces on board from chessBoard array
      * @param g Graphics class instance to draw chess pieces
      */
-    public void drawPiecesFromFEN(String[] fenArr, Graphics g) {
-        if (fenArr == null || fenArr.length == 0) {
-            return;
-        }
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            String fenString = fenArr[row];
-            for (int col = 0; col < BOARD_SIZE; col++) {
-                char c = fenString.toCharArray()[col];
-                int x = col * SQUARE_SIZE;
-                int y = row * SQUARE_SIZE;
-                BufferedImage pieceImage = null;
-                if (!Character.isDigit(c)) {
-                    ChessPieceType chessPieceType = ChessPieceType.fromFenChar(c);
-                    PieceColor pieceColor = Character.isUpperCase(c) ? PieceColor.WHITE : PieceColor.BLACK;
-                    for (ChessPiece piece : chessPieces) {
-                        if (piece.getPieceColor() == pieceColor && piece.getPieceName()
-                                .equalsIgnoreCase(chessPieceType.pieceName)) {
-                            pieceImage = getChessPieceImage(piece);
-                        }
-                    }
-                    g.drawImage(pieceImage, x, y, SQUARE_SIZE, SQUARE_SIZE, this);
-                }
+    public void drawPieces(Graphics g) {
+        int pieceCount = 0;
+        for (ChessPiece piece : chessBoard) {
+            int row = pieceCount / BOARD_SIZE;
+            int col = pieceCount % BOARD_SIZE;
+            BufferedImage image = getChessPieceImage(piece);
+            int x = col * SQUARE_SIZE;
+            int y = row * SQUARE_SIZE;
+            if (piece != null) {
+                g.drawImage(image, x, y, SQUARE_SIZE, SQUARE_SIZE, this);
             }
+            pieceCount ++;
         }
     }
-
-
-    /**
-     *
-     * @param fen String of FEN notation
-     * @return returns String array representation of FEN notation
-     * In standard FEN notation, number of empty squares on board is represented by numeric value.
-     * For my app's purposes, this numeric value is "translated" into 0s. For example, if FEN contains 8, returned array
-     * will contain 8 zeroes instead.
-     */
-    private String[] generateFenArrayFromString(String fen) {
-        String [] fenArr = fen.split("/");
-        for (int i = 0; i < fenArr.length; i++) {
-            String fenLine = fenArr[i];
-            StringBuilder newFenLine = new StringBuilder();
-            for (char c : fenLine.toCharArray()) {
-                if (Character.isDigit(c)) {
-                    int countOfZeros = Integer.parseInt(Character.toString(c));
-                    newFenLine.append("0".repeat(Math.max(0, countOfZeros)));
-                } else {
-                    newFenLine.append(c);
-                }
-            }
-            fenLine = newFenLine.toString();
-            fenArr[i] = fenLine;
-        }
-        return fenArr;
-    }
-
 }
