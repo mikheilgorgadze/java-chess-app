@@ -44,7 +44,7 @@ public class Config {
 
     public static Color getDarkColor() {
         try {
-            return Color.decode(properties.getProperty("dark_color"));
+            return Color.decode(properties.getProperty("color.dark"));
         } catch (Exception e) {
             return Color.GRAY;
         }
@@ -53,7 +53,7 @@ public class Config {
 
     public static Color getLightColor() {
         try {
-            return Color.decode(properties.getProperty("light_color"));
+            return Color.decode(properties.getProperty("color.light"));
         } catch (Exception e) {
             return Color.WHITE;
         }
