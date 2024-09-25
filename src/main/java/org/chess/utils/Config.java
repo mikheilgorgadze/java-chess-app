@@ -58,4 +58,13 @@ public class Config {
             return Color.WHITE;
         }
     }
+
+
+    public static Color getHighlightedColor() {
+        try {
+            return Color.decode(properties.getProperty("color.light"));
+        } catch (Exception e) {
+            return Color.YELLOW;
+        }
+    }
 }

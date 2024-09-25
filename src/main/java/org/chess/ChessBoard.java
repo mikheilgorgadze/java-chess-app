@@ -9,27 +9,19 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChessBoard extends JPanel {
-    private final HashMap<ChessPiece, BufferedImage> chessPieceToImage = new HashMap<>();
+    private final Map<Position, ChessPiece> chessBoard = new HashMap<>();
 
-    private final ArrayList<ChessPiece> chessBoard = new ArrayList<>();
-
-    private final ChessPiece[] chessPieces = {
-            new Pawn(PieceColor.WHITE), new Pawn(PieceColor.BLACK),
-            new Bishop(PieceColor.WHITE), new Bishop(PieceColor.BLACK),
-            new Knight(PieceColor.WHITE), new Knight(PieceColor.BLACK),
-            new Rook(PieceColor.WHITE), new Rook(PieceColor.BLACK),
-            new Queen(PieceColor.WHITE), new Queen(PieceColor.BLACK),
-            new King(PieceColor.WHITE), new King(PieceColor.BLACK),
-    };
     private static final int BOARD_SIZE = Config.getBoardSize();
     private static final int SQUARE_SIZE = Config.getSquareSize();
 
+    private ChessPiece selectedPiece;
+    private Position selectedPosition;
+
     public ChessBoard() {
-        loadChessPieces();
         addMouseListener(new ChessBoardMouseListener());
         fillChessBoardArrayFromFEN(Config.getInitialFEN());
     }
@@ -37,9 +29,36 @@ public class ChessBoard extends JPanel {
     private class ChessBoardMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            int col = e.getX() / BOARD_SIZE;
-            int row = e.getY() / BOARD_SIZE;
+            int file = e.getX() / SQUARE_SIZE;
+            int rank = 7 - (e.getY() / SQUARE_SIZE);
+            Position pos = new Position(rank, file);
+            try {
+                selectPiece(pos);
+            } catch (Exception ignore){};
+            repaint();
         }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            int file = e.getX() / SQUARE_SIZE;
+            int rank = 7 - (e.getY() / SQUARE_SIZE);
+            setPieceAt(new Position(rank, file));
+            repaint();
+        }
+    }
+
+
+    private void selectPiece(Position position) {
+        ChessPiece piece = chessBoard.get(position);
+        if (piece != null) {
+            selectedPiece = piece;
+            selectedPosition = position;
+        }
+    }
+
+    private void setPieceAt( Position position) {
+        chessBoard.remove(selectedPosition);
+        chessBoard.put(position, selectedPiece);
     }
 
     /**
@@ -51,58 +70,41 @@ public class ChessBoard extends JPanel {
         super.paintComponent(g);
         drawBoard(g, Config.getLightColor(), Config.getDarkColor());
         drawPieces(g);
-
+        if (selectedPosition != null) {
+            highlightSquare(g, selectedPosition);
+        }
     }
 
+    private void highlightSquare(Graphics g, Position position) {
+        g.setColor(new Color(255, 255, 0, 128));
+        g.fillRect(position.getFile() * SQUARE_SIZE, (7 - position.getRank()) * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+    }
 
     private void fillChessBoardArrayFromFEN(String fen) {
         if (fen == null || fen.isEmpty() ) {
             throw new IllegalArgumentException("Argument should not be null");
         }
-        int pieceCount = 0;
+        int rank = 7;
+        int file = 0;
         for (char c : fen.toCharArray()) {
             if (Fen.isCorrectFenSymbol(c)){
-                int row = pieceCount / BOARD_SIZE;
-                int col = pieceCount % BOARD_SIZE;
-                for (ChessPiece chessPiece : chessPieces) {
-                    PieceColor pieceColor = Character.isUpperCase(c) ? PieceColor.WHITE : PieceColor.BLACK;
-                    if (chessPiece.getPieceName().equals(ChessPieceType.fromFenChar(c).pieceName) &&
-                    chessPiece.getPieceColor().equals(pieceColor)
-                    ) {
-                        chessPiece.setPosition(new Position(row + 1, col + 1));
-                        chessBoard.add(chessPiece);
-                        pieceCount ++;
-                    }
-                }
+                ChessPieceType pieceType = ChessPieceType.fromFenChar(c);
+                PieceColor color = Character.isUpperCase(c) ? PieceColor.WHITE : PieceColor.BLACK;
+                Position position = new Position(rank, file);
+                String pieceName = color.name().toLowerCase() + "-" + pieceType.pieceName;
+                BufferedImage image = ResourceManager.loadImage(pieceName);
+                ChessPiece piece = new ChessPiece(color, position, pieceType, image);
+                chessBoard.put(position, piece);
+                file++;
             } else if (Character.isDigit(c)) {
-                for (int i = 0; i < Integer.parseInt(Character.toString(c)); i++) {
-                    chessBoard.add(null);
-                    pieceCount ++;
-                }
-            } else if (c != '/') {
+                file += Character.getNumericValue(c);
+            } else if (c == '/') {
+                rank--;
+                file=0;
+            } else {
                 throw new RuntimeException(ChessException.ILLEGAL_FEN_SYMBOL.message);
             }
         }
-    }
-
-    /**
-     * Initializes chessPieceToImage HashMap. Each piece will have it's corresponding image
-     */
-    private void loadChessPieces() {
-        for (ChessPiece piece : chessPieces) {
-            String pieceName = piece.getPieceColor().name().toLowerCase() + "-" + piece.getPieceName();
-            BufferedImage pieceImage = ResourceManager.loadImage(pieceName);
-            chessPieceToImage.put(piece, pieceImage);
-        }
-    }
-
-    /**
-     *
-     * @param chessPiece ChessPiece object instance
-     * @return ChessPiece's corresponding image is returned from chessPieceToImage HashMap
-     */
-    private BufferedImage getChessPieceImage(ChessPiece chessPiece) {
-        return chessPieceToImage.get(chessPiece);
     }
 
     /**
@@ -110,11 +112,11 @@ public class ChessBoard extends JPanel {
      * @param g Graphics class instance, so function is able to graphically draw chess board
      */
     private void drawBoard(Graphics g, Color light, Color dark) {
-        for (int row = 0; row < BOARD_SIZE; row++) {
-            for (int col = 0; col < BOARD_SIZE; col++) {
-                int x = col * SQUARE_SIZE;
-                int y = row * SQUARE_SIZE;
-                g.setColor((row + col) % 2 == 0 ? light : dark);
+        for (int rank = 0; rank < BOARD_SIZE; rank++) {
+            for (int file = 0; file < BOARD_SIZE; file++) {
+                int x = file * SQUARE_SIZE;
+                int y = rank * SQUARE_SIZE;
+                g.setColor((rank + file) % 2 == 0 ? light : dark);
                 g.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
             }
         }
@@ -125,17 +127,13 @@ public class ChessBoard extends JPanel {
      * @param g Graphics class instance to draw chess pieces
      */
     public void drawPieces(Graphics g) {
-        int pieceCount = 0;
-        for (ChessPiece piece : chessBoard) {
-            int row = pieceCount / BOARD_SIZE;
-            int col = pieceCount % BOARD_SIZE;
-            BufferedImage image = getChessPieceImage(piece);
-            int x = col * SQUARE_SIZE;
-            int y = row * SQUARE_SIZE;
-            if (piece != null) {
-                g.drawImage(image, x, y, SQUARE_SIZE, SQUARE_SIZE, this);
-            }
-            pieceCount ++;
+        for (Map.Entry<Position, ChessPiece> entry : chessBoard.entrySet()) {
+            Position position = entry.getKey();
+            ChessPiece chessPiece = entry.getValue();
+            int x = position.getFile() * SQUARE_SIZE;
+            int y = (7 - position.getRank()) * SQUARE_SIZE;
+            g.drawImage(chessPiece.getImage(), x, y, SQUARE_SIZE, SQUARE_SIZE, this);
         }
     }
+
 }

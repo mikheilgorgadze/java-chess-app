@@ -4,43 +4,54 @@ import org.chess.exceptions.ChessException;
 import org.chess.exceptions.PositionException;
 
 public class Position {
-    private int row;
-    private int col;
-    private final int min_row_col = 1;
-    private final int max_row_col = 8;
+    private int rank;
+    private int file;
+    private final int min_row_col = 0;
+    private final int max_row_col = 7;
 
-    public Position(int row, int col) {
-        if (row < min_row_col || row > max_row_col || col < min_row_col || col > max_row_col) {
+    public Position(int rank, int file) {
+        if (rank < min_row_col || rank > max_row_col || file < min_row_col || file > max_row_col) {
             throw new PositionException(ChessException.POSITION_OUT_OF_BOUNDS);
         }
-        this.col = col;
-        this.row = row;
+        this.file = file;
+        this.rank = rank;
     }
 
-    public int getRow() {
-        return row;
+    public int getRank() {
+        return rank;
     }
 
-    public void setRow(int row) {
-        if (row < min_row_col || row > max_row_col) {
+    public void setRank(int rank) {
+        if (rank < min_row_col || rank > max_row_col) {
             throw new PositionException(ChessException.ROW_OUT_OF_BOUNDS);
         }
-        this.row = row;
+        this.rank = rank;
     }
 
-    public int getCol() {
-        return col;
+    public int getFile() {
+        return file;
     }
 
-    public void setCol(int col) {
-        if (col < min_row_col || col > max_row_col) {
+    public void setFile(int file) {
+        if (file < min_row_col || file > max_row_col) {
             throw new PositionException(ChessException.COlUMN_OUT_OF_BOUNDS);
         }
-        this.col = col;
+        this.file = file;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Position position = (Position) o;
+        return rank == position.rank && file == position.file;
     }
 
     @Override
+    public int hashCode() {
+        return 31 * rank + file;
+    }
+    @Override
     public String toString() {
-        return Character.toString(('a' - 1 + col)) + (Config.getBoardSize() - row + 1);
+        return Character.toString(('a' + file)) + (rank + 1);
     }
 }

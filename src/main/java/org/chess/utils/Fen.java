@@ -12,23 +12,19 @@ public class Fen {
      * For my app's purposes, this numeric value is "translated" into 0s. For example, if FEN contains 8, returned array
      * will contain 8 zeroes instead.
      */
-    public static String[] generateFenArrayFromString(String fen) {
-        String [] fenArr = fen.split("/");
-        for (int i = 0; i < fenArr.length; i++) {
-            String fenLine = fenArr[i];
-            StringBuilder newFenLine = new StringBuilder();
-            for (char c : fenLine.toCharArray()) {
-                if (Character.isDigit(c)) {
-                    int countOfZeros = Integer.parseInt(Character.toString(c));
-                    newFenLine.append("0".repeat(Math.max(0, countOfZeros)));
-                } else {
-                    newFenLine.append(c);
-                }
+    public static String generateFullFenString(String fen) {
+        StringBuilder fenFullString = new StringBuilder();
+        for (int i = 0; i < fen.length(); i++) {
+            char c = fen.charAt(i);
+            if (Character.isDigit(c)) {
+                fenFullString.append("0"
+                        .repeat(Math.max(0, Integer.parseInt(Character.toString(c)))));
+            } else if (isCorrectFenSymbol(c)) {
+                fenFullString.append(c);
             }
-            fenLine = newFenLine.toString();
-            fenArr[i] = fenLine;
         }
-        return fenArr;
+
+        return fenFullString.toString();
     }
 
 
