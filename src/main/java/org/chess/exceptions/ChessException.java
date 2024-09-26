@@ -6,7 +6,7 @@ public enum ChessException {
     POSITION_OUT_OF_BOUNDS("Illegal position"),
     ILLEGAL_FEN_SYMBOL("Illegal fen symbol provided");
     public final String message;
-    private ChessException(String message) {
+    ChessException(String message) {
         this.message = message;
     };
 }

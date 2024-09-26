@@ -9,6 +9,6 @@ public class ChessApp extends JFrame {
         setTitle(Config.getWindowTitle());
         setSize(Config.getWindowWidth(), Config.getWindowHeight());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(new ChessBoard());
+        add(new ChessBoardUI());
     }
 }
