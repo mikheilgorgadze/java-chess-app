@@ -36,7 +36,6 @@ public class ChessBoardUI extends JPanel {
             highlightSquare(g, selectedPosition);
         }
     }
-
     private class ChessBoardMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
@@ -75,7 +74,7 @@ public class ChessBoardUI extends JPanel {
 
     private void highlightSquare(Graphics g, Position position) {
         int squareSize = chessBoard.getSquareSize();
-        g.setColor(new Color(255, 255, 0, 128));
+        g.setColor(Config.getHighlightedColor());
         g.fillRect(position.getFile() * squareSize, (7 - position.getRank()) * squareSize, squareSize, squareSize);
     }
 

@@ -17,8 +17,8 @@ public class ChessBoard {
     public void drawBoard(Graphics g) {
         for (int rank = 0; rank < boardSize; rank++) {
             for (int file = 0; file < boardSize; file++) {
-                int x = file * boardSize;
-                int y = rank * boardSize;
+                int x = file * squareSize;
+                int y = rank * squareSize;
                 g.setColor((rank + file) % 2 == 0 ? lightSquareColor : darkSquareColor);
                 g.fillRect(x, y, squareSize, squareSize);
             }

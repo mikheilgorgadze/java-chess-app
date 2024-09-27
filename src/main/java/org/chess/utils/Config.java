@@ -62,9 +62,10 @@ public class Config {
 
     public static Color getHighlightedColor() {
         try {
-            return Color.decode(properties.getProperty("color.light"));
+            int hex = Integer.parseInt(properties.getProperty("color.highlight"), 16);
+            return new Color(hex, true);
         } catch (Exception e) {
-            return Color.YELLOW;
+            return new Color(60, 255, 50, 100);
         }
     }
 }
