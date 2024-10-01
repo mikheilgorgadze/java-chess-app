@@ -3,16 +3,21 @@ package org.chess.utils;
 import org.chess.exceptions.ChessException;
 import org.chess.exceptions.PositionException;
 
-public class Position {
-    private int rank;
-    private int file;
-    private final int min_row_col = 0;
-    private final int max_row_col = 7;
+import java.util.Optional;
 
-    public Position(int rank, int file) {
-        if (rank < min_row_col || rank > max_row_col || file < min_row_col || file > max_row_col) {
-            throw new PositionException(ChessException.POSITION_OUT_OF_BOUNDS);
-        }
+public class Position {
+    private final int rank;
+    private final int file;
+    private static final int min_row_col = 0;
+    private static final int max_row_col = 7;
+    private static final Position INVALID = new Position(-1, -1);
+
+
+    public static Position create(int rank, int file) {
+        return isValidPosition(rank, file) ? new Position(rank, file) : INVALID;
+    }
+
+    private Position(int rank, int file) {
         this.file = file;
         this.rank = rank;
     }
@@ -21,22 +26,24 @@ public class Position {
         return rank;
     }
 
-    public void setRank(int rank) {
-        if (rank < min_row_col || rank > max_row_col) {
-            throw new PositionException(ChessException.ROW_OUT_OF_BOUNDS);
-        }
-        this.rank = rank;
-    }
-
     public int getFile() {
         return file;
     }
 
-    public void setFile(int file) {
-        if (file < min_row_col || file > max_row_col) {
-            throw new PositionException(ChessException.COlUMN_OUT_OF_BOUNDS);
-        }
-        this.file = file;
+    public boolean isValid() {
+        return this != INVALID;
+    }
+
+    public static boolean isValidPosition(int rank, int file) {
+        return isValidRank(rank) && isValidFile(file);
+    }
+
+    private static boolean isValidFile(int file) {
+        return file >= min_row_col && file <= max_row_col;
+    }
+
+    private static boolean isValidRank(int rank) {
+        return rank >= min_row_col && rank <= max_row_col;
     }
     @Override
     public boolean equals(Object o) {

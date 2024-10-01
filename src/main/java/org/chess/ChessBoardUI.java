@@ -9,11 +9,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ChessBoardUI extends JPanel {
-    private final Map<Position, ChessPiece> chessPieceMap = new HashMap<>();
     private final ChessBoard chessBoard = new ChessBoard();
     private ChessPiece selectedPiece;
     private Position selectedPosition;
@@ -42,10 +40,8 @@ public class ChessBoardUI extends JPanel {
             int squareSize = chessBoard.getSquareSize();
             int file = e.getX() / squareSize;
             int rank = 7 - (e.getY() / squareSize);
-            Position pos = new Position(rank, file);
-            try {
-                selectPiece(pos);
-            } catch (Exception ignore){};
+            Position pos = Position.create(rank, file);
+            selectPiece(pos);
             repaint();
         }
 
@@ -54,13 +50,20 @@ public class ChessBoardUI extends JPanel {
             int squareSize = chessBoard.getSquareSize();
             int file = e.getX() / squareSize;
             int rank = 7 - (e.getY() / squareSize);
-            setPieceAt(new Position(rank, file));
+            Position newPosition = Position.create(rank, file);
+            if (selectedPiece != null && selectedPiece.isValidMove(newPosition, chessBoard)) {
+                setPieceAt(newPosition);
+                PieceColor nextMoveSideColor = selectedPiece.getPieceColor() == PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK;
+                chessBoard.setNextMoveSideColor(nextMoveSideColor);
+                selectedPiece = null;
+                selectedPosition = null;
+            }
             repaint();
         }
     }
 
     private void selectPiece(Position position) {
-        ChessPiece piece = chessPieceMap.get(position);
+        ChessPiece piece = chessBoard.getPieceAt(position);
         if (piece != null) {
             selectedPiece = piece;
             selectedPosition = position;
@@ -68,8 +71,9 @@ public class ChessBoardUI extends JPanel {
     }
 
     private void setPieceAt( Position position) {
-        chessPieceMap.remove(selectedPosition);
-        chessPieceMap.put(position, selectedPiece);
+        selectedPiece.setPosition(position);
+        chessBoard.removePieceFrom(selectedPosition);
+        chessBoard.addPieceAt(position, selectedPiece);
     }
 
     private void highlightSquare(Graphics g, Position position) {
@@ -88,11 +92,11 @@ public class ChessBoardUI extends JPanel {
             if (Fen.isCorrectFenSymbol(c)){
                 ChessPieceType pieceType = ChessPieceType.fromFenChar(c);
                 PieceColor color = Character.isUpperCase(c) ? PieceColor.WHITE : PieceColor.BLACK;
-                Position position = new Position(rank, file);
+                Position position = Position.create(rank, file);
                 String pieceName = color.name().toLowerCase() + "-" + pieceType.pieceName;
                 BufferedImage image = ResourceManager.loadImage(pieceName);
                 ChessPiece piece = new ChessPiece(color, position, pieceType, image);
-                chessPieceMap.put(position, piece);
+                chessBoard.addPieceAt(position, piece);
                 file++;
             } else if (Character.isDigit(c)) {
                 file += Character.getNumericValue(c);
@@ -112,12 +116,15 @@ public class ChessBoardUI extends JPanel {
      */
     public void drawPieces(Graphics g) {
         int squareSize = chessBoard.getSquareSize();
+        Map<Position, ChessPiece> chessPieceMap = chessBoard.getChessPieceMap();
         for (Map.Entry<Position, ChessPiece> entry : chessPieceMap.entrySet()) {
             Position position = entry.getKey();
             ChessPiece chessPiece = entry.getValue();
             int x = position.getFile() * squareSize;
             int y = (7 - position.getRank()) * squareSize;
-            g.drawImage(chessPiece.getImage(), x, y, squareSize, squareSize, this);
+            if (chessPiece != null) {
+                g.drawImage(chessPiece.getImage(), x, y, squareSize, squareSize, this);
+            }
         }
     }
 
