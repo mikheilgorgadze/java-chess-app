@@ -10,19 +10,24 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 @Getter
-@Setter
 public class ChessPiece {
     private final PieceColor pieceColor;
+    @Setter
     private Position position;
     private final ChessPieceType pieceType;
     private final BufferedImage image;
+    @Setter
     private boolean isMoved;
 
-    public ChessPiece(PieceColor pieceColor, Position position, ChessPieceType pieceType, BufferedImage image) {
+    private ChessPiece(PieceColor pieceColor, Position position, ChessPieceType pieceType, BufferedImage image) {
         this.pieceColor = pieceColor;
         this.position = position;
         this.pieceType = pieceType;
         this.image = image;
+    }
+
+    public static ChessPiece of (PieceColor pieceColor, Position position, ChessPieceType pieceType, BufferedImage image) {
+        return new ChessPiece(pieceColor, position, pieceType, image);
     }
 
     public boolean isValidMove(Position newPosition, ChessBoard chessBoard) {
@@ -85,7 +90,7 @@ public class ChessPiece {
         if (Math.abs(newRank - currentRank) == Math.abs(newFile - currentFile)) {
             boolean found = false;
             for (int i = 1; i <= Math.abs(newRank - currentRank); i++) {
-                ChessPiece currentPiece = chessBoard.getPieceAt(Position.create(currentRank + i, currentFile + i));
+                ChessPiece currentPiece = chessBoard.getPieceAt(Position.of(currentRank + i, currentFile + i));
                 if (currentPiece != null) {
                     found = true;
                     if (currentPiece.pieceColor == this.pieceColor) {
@@ -95,8 +100,6 @@ public class ChessPiece {
             }
             result = !found;
         }
-
-        System.out.println("result: " + result);
         return result;
     }
 

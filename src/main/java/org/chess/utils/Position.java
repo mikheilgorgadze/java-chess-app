@@ -1,10 +1,8 @@
 package org.chess.utils;
 
-import org.chess.exceptions.ChessException;
-import org.chess.exceptions.PositionException;
+import lombok.Getter;
 
-import java.util.Optional;
-
+@Getter
 public class Position {
     private final int rank;
     private final int file;
@@ -13,21 +11,13 @@ public class Position {
     private static final Position INVALID = new Position(-1, -1);
 
 
-    public static Position create(int rank, int file) {
+    public static Position of (int rank, int file) {
         return isValidPosition(rank, file) ? new Position(rank, file) : INVALID;
     }
 
     private Position(int rank, int file) {
         this.file = file;
         this.rank = rank;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public int getFile() {
-        return file;
     }
 
     public boolean isValid() {

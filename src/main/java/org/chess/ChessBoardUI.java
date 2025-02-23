@@ -40,7 +40,7 @@ public class ChessBoardUI extends JPanel {
             int squareSize = chessBoard.getSquareSize();
             int file = e.getX() / squareSize;
             int rank = 7 - (e.getY() / squareSize);
-            Position pos = Position.create(rank, file);
+            Position pos = Position.of(rank, file);
             chessBoard.selectPieceAt(pos);
             repaint();
         }
@@ -50,7 +50,7 @@ public class ChessBoardUI extends JPanel {
             int squareSize = chessBoard.getSquareSize();
             int file = e.getX() / squareSize;
             int rank = 7 - (e.getY() / squareSize);
-            Position newPosition = Position.create(rank, file);
+            Position newPosition = Position.of(rank, file);
             chessBoard.moveSelectedPieceTo(newPosition);
             repaint();
         }
@@ -71,10 +71,10 @@ public class ChessBoardUI extends JPanel {
             if (Fen.isCorrectFenSymbol(c)){
                 ChessPieceType pieceType = ChessPieceType.fromFenChar(c);
                 PieceColor color = Character.isUpperCase(c) ? PieceColor.WHITE : PieceColor.BLACK;
-                Position position = Position.create(rank, file);
+                Position position = Position.of(rank, file);
                 String pieceName = color.name().toLowerCase() + "-" + pieceType.pieceName;
                 BufferedImage image = ResourceManager.loadImage(pieceName);
-                ChessPiece piece = new ChessPiece(color, position, pieceType, image);
+                ChessPiece piece = ChessPiece.of(color, position, pieceType, image);
                 chessBoard.addPieceAt(position, piece);
                 file++;
             } else if (Character.isDigit(c)) {
