@@ -1,7 +1,9 @@
 package org.chess.pieces;
 
+import lombok.Getter;
 import org.chess.utils.PieceColor;
 
+@Getter
 public enum ChessPieceType {
     PAWN("pawn", 'P', 'p'),
     BISHOP("bishop", 'B', 'b'),
@@ -14,14 +16,10 @@ public enum ChessPieceType {
     public final char whiteFenChar;
     public final char blackFenChar;
 
-    private ChessPieceType(String pieceName, char whiteFenChar, char blackFenChar) {
+    ChessPieceType(String pieceName, char whiteFenChar, char blackFenChar) {
         this.pieceName = pieceName;
         this.whiteFenChar = whiteFenChar;
         this.blackFenChar = blackFenChar;
-    }
-
-    public String getPieceName() {
-        return pieceName;
     }
 
     public char getFenChar(PieceColor color) {

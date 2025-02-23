@@ -28,7 +28,7 @@ public class ChessBoardUI extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        chessBoard.drawBoard(g);
+        drawBoard(g);
         drawPieces(g);
         if (chessBoard.getSelectedPosition() != null) {
             highlightSquare(g, chessBoard.getSelectedPosition());
@@ -103,6 +103,33 @@ public class ChessBoardUI extends JPanel {
             int y = (7 - position.getRank()) * squareSize;
             if (chessPiece != null) {
                 g.drawImage(chessPiece.getImage(), x, y, squareSize, squareSize, this);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param g Graphics class instance, so function is able to graphically draw chess board
+     */
+    public void drawBoard(Graphics g) {
+        int boardSize = Config.getBoardSize();
+        int squareSize = Config.getSquareSize();
+        Color lightSquareColor = Config.getLightColor();
+        Color darkSquareColor = Config.getDarkColor();
+        for (int rank = 0; rank < boardSize; rank++) {
+            for (int file = 0; file < boardSize; file++) {
+                int x = file * squareSize;
+                int y = rank * squareSize;
+                g.setColor((rank + file) % 2 == 0 ? lightSquareColor : darkSquareColor);
+                g.fillRect(x, y, squareSize, squareSize);
+                g.setColor(Color.BLACK);
+                g.drawRect(x, y, squareSize, squareSize);
+                if (rank == boardSize - 1) {
+                    g.drawString(Character.toString('a' + file), x + squareSize - 10, y + squareSize - 5);
+                }
+                if (file == 0) {
+                    g.drawString(String.valueOf(boardSize - rank), x + 5, y + 15);
+                }
             }
         }
     }

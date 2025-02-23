@@ -1,5 +1,7 @@
 package org.chess;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.chess.pieces.ChessPiece;
 import org.chess.utils.Config;
 import org.chess.utils.PieceColor;
@@ -9,6 +11,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
+@Setter
 public class ChessBoard {
     private final Map<Position, ChessPiece> chessPieceMap = new HashMap<>();
     private final int boardSize = Config.getBoardSize();
@@ -32,17 +36,13 @@ public class ChessBoard {
         chessPieceMap.remove(position);
     }
 
-    public Map<Position, ChessPiece> getChessPieceMap() {
-        return chessPieceMap;
-    }
-
     public void moveSelectedPieceTo(Position newPosition) {
         if (selectedPiece != null && selectedPiece.isValidMove(newPosition, this)) {
             selectedPiece.setMoved(!newPosition.equals(selectedPosition));
             if (selectedPiece.isMoved()) {
                 setPieceAt(newPosition);
                 PieceColor nextMoveSideColor = selectedPiece.getPieceColor() == PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK;
-                this.setNextMoveSideColor(nextMoveSideColor);
+                setNextMoveSideColor(nextMoveSideColor);
                 selectedPiece = null;
                 ChessBoardUI.selectedPosition = null;
             }
@@ -62,48 +62,5 @@ public class ChessBoard {
         selectedPiece.setPosition(position);
         this.removePieceFrom(selectedPosition);
         this.addPieceAt(position, selectedPiece);
-    }
-
-    /**
-     *
-     * @param g Graphics class instance, so function is able to graphically draw chess board
-     */
-    public void drawBoard(Graphics g) {
-        for (int rank = 0; rank < boardSize; rank++) {
-            for (int file = 0; file < boardSize; file++) {
-                int x = file * squareSize;
-                int y = rank * squareSize;
-                g.setColor((rank + file) % 2 == 0 ? lightSquareColor : darkSquareColor);
-                g.fillRect(x, y, squareSize, squareSize);
-                g.setColor(Color.BLACK);
-                g.drawRect(x, y, squareSize, squareSize);
-                if (rank == boardSize - 1) {
-                    g.drawString(Character.toString('a' + file), x + squareSize - 10, y + squareSize - 5);
-                }
-                if (file == 0) {
-                    g.drawString(String.valueOf(boardSize - rank), x + 5, y + 15);
-                }
-            }
-        }
-    }
-
-    public int getSquareSize() {
-        return squareSize;
-    }
-
-    public void setNextMoveSideColor(PieceColor nextMoveSideColor) {
-        this.nextMoveSideColor = nextMoveSideColor;
-    }
-
-    public PieceColor getNextMoveSideColor() {
-        return nextMoveSideColor;
-    }
-
-    public Position getSelectedPosition() {
-        return selectedPosition;
-    }
-
-    public void setSelectedPosition(Position selectedPosition) {
-        this.selectedPosition = selectedPosition;
     }
 }

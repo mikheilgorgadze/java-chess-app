@@ -1,5 +1,7 @@
 package org.chess.pieces;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.chess.ChessBoard;
 import org.chess.utils.PieceColor;
 import org.chess.utils.Position;
@@ -7,6 +9,8 @@ import org.chess.utils.Position;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
+@Getter
+@Setter
 public class ChessPiece {
     private final PieceColor pieceColor;
     private Position position;
@@ -68,7 +72,6 @@ public class ChessPiece {
                 }
             }
         }
-
         return result;
     }
 
@@ -90,47 +93,24 @@ public class ChessPiece {
                     }
                 }
             }
-            return !found;
+            result = !found;
         }
 
+        System.out.println("result: " + result);
         return result;
     }
 
     private boolean isPiecePresentOnLine(Position startingPosition, Position endingPosition) {
-               
         return false;
-    }
-
-    public PieceColor getPieceColor() {
-        return pieceColor;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    public String getPieceName() {
-        return pieceType.pieceName;
-    }
-
-    public BufferedImage getImage() {
-        return image;
     }
 
     @Override
     public String toString() {
-        return String.format("%s %s at position %s", getPieceColor().toString().toLowerCase(), getPieceName().toLowerCase(), getPosition());
+        return String.format("%s %s at position %s", this.pieceColor.toString()
+                .toLowerCase(), this.pieceType.pieceName.toLowerCase(), this.position);
     }
 
     public boolean isMoved() {
         return isMoved;
-    }
-
-    public void setMoved(boolean moved) {
-        isMoved = moved;
     }
 }
