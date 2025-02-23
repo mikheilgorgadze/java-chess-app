@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class ChessBoardUI extends JPanel {
     private final ChessBoard chessBoard = new ChessBoard();
-    private ChessPiece selectedPiece;
-    private Position selectedPosition;
+    public static ChessPiece selectedPiece;
+    public static Position selectedPosition;
 
     public ChessBoardUI() {
         addMouseListener(new ChessBoardMouseListener());
@@ -30,8 +30,8 @@ public class ChessBoardUI extends JPanel {
         super.paintComponent(g);
         chessBoard.drawBoard(g);
         drawPieces(g);
-        if (selectedPosition != null) {
-            highlightSquare(g, selectedPosition);
+        if (chessBoard.getSelectedPosition() != null) {
+            highlightSquare(g, chessBoard.getSelectedPosition());
         }
     }
     private class ChessBoardMouseListener extends MouseAdapter {
@@ -41,7 +41,7 @@ public class ChessBoardUI extends JPanel {
             int file = e.getX() / squareSize;
             int rank = 7 - (e.getY() / squareSize);
             Position pos = Position.create(rank, file);
-            selectPiece(pos);
+            chessBoard.selectPieceAt(pos);
             repaint();
         }
 
@@ -51,31 +51,10 @@ public class ChessBoardUI extends JPanel {
             int file = e.getX() / squareSize;
             int rank = 7 - (e.getY() / squareSize);
             Position newPosition = Position.create(rank, file);
-            if (selectedPiece != null && selectedPiece.isValidMove(newPosition, chessBoard)) {
-                setPieceAt(newPosition);
-                PieceColor nextMoveSideColor = selectedPiece.getPieceColor() == PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK;
-                chessBoard.setNextMoveSideColor(nextMoveSideColor);
-                selectedPiece = null;
-                selectedPosition = null;
-            }
+            chessBoard.moveSelectedPieceTo(newPosition);
             repaint();
         }
     }
-
-    private void selectPiece(Position position) {
-        ChessPiece piece = chessBoard.getPieceAt(position);
-        if (piece != null) {
-            selectedPiece = piece;
-            selectedPosition = position;
-        }
-    }
-
-    private void setPieceAt( Position position) {
-        selectedPiece.setPosition(position);
-        chessBoard.removePieceFrom(selectedPosition);
-        chessBoard.addPieceAt(position, selectedPiece);
-    }
-
     private void highlightSquare(Graphics g, Position position) {
         int squareSize = chessBoard.getSquareSize();
         g.setColor(Config.getHighlightedColor());

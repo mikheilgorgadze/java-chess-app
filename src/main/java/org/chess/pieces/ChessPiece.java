@@ -12,6 +12,7 @@ public class ChessPiece {
     private Position position;
     private final ChessPieceType pieceType;
     private final BufferedImage image;
+    private boolean isMoved;
 
     public ChessPiece(PieceColor pieceColor, Position position, ChessPieceType pieceType, BufferedImage image) {
         this.pieceColor = pieceColor;
@@ -26,26 +27,25 @@ public class ChessPiece {
             return false;
         }
         boolean result = false;
-        int newRank = newPosition.getRank();
-        int newFile = newPosition.getFile();
-        int currentRank = this.position.getRank();
-        int currentFile = this.position.getFile();
         ChessPiece chessPieceOnNewPosition = chessPieceMap.get(newPosition);
 
         if (this.pieceColor != chessBoard.getNextMoveSideColor()) {
             switch (this.pieceType) {
-                case PAWN -> result = isPawnMoveValid(currentRank, newRank, currentFile, newFile, chessPieceOnNewPosition);
-                case BISHOP -> result = isBishopMoveValid();
-
+                case PAWN -> result = isPawnMoveValid(this.position, newPosition, chessPieceOnNewPosition);
+                case BISHOP -> result = isBishopMoveValid(this.position, newPosition, chessBoard);
             }
         }
         return result;
     }
 
-    private boolean isPawnMoveValid(int currentRank, int newRank, int currentFile, int newFile, ChessPiece chessPieceOnNewPosition) {
+    private boolean isPawnMoveValid(Position currentPosition, Position newPosition, ChessPiece chessPieceOnNewPosition) {
         boolean result = false;
         int secondRank = 1;
         int seventhRank = 6;
+        int currentRank = currentPosition.getRank();
+        int currentFile = currentPosition.getFile();
+        int newRank = newPosition.getRank();
+        int newFile = newPosition.getFile();
         boolean isOnDiagonal = currentFile - newFile != 0;
 
         switch (this.pieceColor) {
@@ -60,7 +60,7 @@ public class ChessPiece {
             }
             case BLACK -> {
                 if ((currentRank == seventhRank && newRank >= (currentRank - 2)) || (newRank >= (currentRank - 1)) && newRank < currentRank) {
-                    if (chessPieceOnNewPosition != null && isOnDiagonal && chessPieceOnNewPosition.pieceColor != PieceColor.BLACK) {
+                    if (chessPieceOnNewPosition != null && isOnDiagonal && chessPieceOnNewPosition.pieceColor != this.pieceColor) {
                         result = true;
                     } else if (chessPieceOnNewPosition == null && !isOnDiagonal) {
                         result = true;
@@ -72,8 +72,32 @@ public class ChessPiece {
         return result;
     }
 
-    private boolean isBishopMoveValid() {
-        //TODO
+    private boolean isBishopMoveValid(Position currentPosition, Position newPosition, ChessBoard chessBoard) {
+        boolean result = false;
+        int currentRank = currentPosition.getRank();
+        int currentFile = currentPosition.getFile();
+        int newRank = newPosition.getRank();
+        int newFile = newPosition.getFile();
+
+        if (Math.abs(newRank - currentRank) == Math.abs(newFile - currentFile)) {
+            boolean found = false;
+            for (int i = 1; i <= Math.abs(newRank - currentRank); i++) {
+                ChessPiece currentPiece = chessBoard.getPieceAt(Position.create(currentRank + i, currentFile + i));
+                if (currentPiece != null) {
+                    found = true;
+                    if (currentPiece.pieceColor == this.pieceColor) {
+                        return false;
+                    }
+                }
+            }
+            return !found;
+        }
+
+        return result;
+    }
+
+    private boolean isPiecePresentOnLine(Position startingPosition, Position endingPosition) {
+               
         return false;
     }
 
@@ -100,5 +124,13 @@ public class ChessPiece {
     @Override
     public String toString() {
         return String.format("%s %s at position %s", getPieceColor().toString().toLowerCase(), getPieceName().toLowerCase(), getPosition());
+    }
+
+    public boolean isMoved() {
+        return isMoved;
+    }
+
+    public void setMoved(boolean moved) {
+        isMoved = moved;
     }
 }

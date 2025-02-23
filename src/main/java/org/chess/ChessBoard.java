@@ -16,6 +16,10 @@ public class ChessBoard {
     private final Color lightSquareColor = Config.getLightColor();
     private final Color darkSquareColor = Config.getDarkColor();
     private PieceColor nextMoveSideColor = PieceColor.BLACK;
+    private ChessPiece selectedPiece;
+
+
+    private Position selectedPosition;
 
     public void addPieceAt(Position position, ChessPiece piece) {
         chessPieceMap.put(position, piece);
@@ -30,6 +34,34 @@ public class ChessBoard {
 
     public Map<Position, ChessPiece> getChessPieceMap() {
         return chessPieceMap;
+    }
+
+    public void moveSelectedPieceTo(Position newPosition) {
+        if (selectedPiece != null && selectedPiece.isValidMove(newPosition, this)) {
+            selectedPiece.setMoved(!newPosition.equals(selectedPosition));
+            if (selectedPiece.isMoved()) {
+                setPieceAt(newPosition);
+                PieceColor nextMoveSideColor = selectedPiece.getPieceColor() == PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK;
+                this.setNextMoveSideColor(nextMoveSideColor);
+                selectedPiece = null;
+                ChessBoardUI.selectedPosition = null;
+            }
+        }
+    }
+
+
+    public void selectPieceAt(Position position) {
+        ChessPiece piece = this.getPieceAt(position);
+        if (piece != null) {
+            selectedPiece = piece;
+            selectedPosition = position;
+        }
+    }
+
+    private void setPieceAt( Position position) {
+        selectedPiece.setPosition(position);
+        this.removePieceFrom(selectedPosition);
+        this.addPieceAt(position, selectedPiece);
     }
 
     /**
@@ -65,5 +97,13 @@ public class ChessBoard {
 
     public PieceColor getNextMoveSideColor() {
         return nextMoveSideColor;
+    }
+
+    public Position getSelectedPosition() {
+        return selectedPosition;
+    }
+
+    public void setSelectedPosition(Position selectedPosition) {
+        this.selectedPosition = selectedPosition;
     }
 }
