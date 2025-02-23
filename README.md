@@ -31,7 +31,7 @@ This is a Java-based chess game application with a graphical user interface (GUI
 
 3. Run the application:
     ```sh
-    mvn exec:java -Dexec.mainClass="org.chess.ChessGame"
+    mvn exec:java
     ```
 
 ## Usage
