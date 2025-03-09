@@ -31,20 +31,25 @@ public class ChessPiece {
     }
 
     public boolean isValidMove(Position newPosition, ChessBoard chessBoard) {
-        Map<Position, ChessPiece> chessPieceMap = chessBoard.getChessPieceMap();
-        if (newPosition == null || chessPieceMap == null) {
+        if (newPosition == null || !newPosition.isValid()) {
             return false;
         }
-        boolean result = false;
-        ChessPiece chessPieceOnNewPosition = chessPieceMap.get(newPosition);
+        ChessPiece chessPieceOnNewPosition = chessBoard.getPieceAt(newPosition);
 
         if (this.pieceColor != chessBoard.getNextMoveSideColor()) {
             switch (this.pieceType) {
-                case PAWN -> result = isPawnMoveValid(this.position, newPosition, chessPieceOnNewPosition);
-                case BISHOP -> result = isBishopMoveValid(this.position, newPosition, chessBoard);
+                case PAWN -> {
+                    return isPawnMoveValid(this.position, newPosition, chessPieceOnNewPosition);
+                }
+                case BISHOP -> {
+                    return isBishopMoveValid(this.position, newPosition, chessBoard);
+                }
+                default -> {
+                    return false;
+                }
             }
         }
-        return result;
+        return false;
     }
 
     private boolean isPawnMoveValid(Position currentPosition, Position newPosition, ChessPiece chessPieceOnNewPosition) {
