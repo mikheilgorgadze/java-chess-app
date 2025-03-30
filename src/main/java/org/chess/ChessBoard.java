@@ -41,7 +41,7 @@ public class ChessBoard {
             selectedPiece.setMoved(!newPosition.equals(selectedPosition));
             if (selectedPiece.isMoved()) {
                 setPieceAt(newPosition);
-                PieceColor nextMoveSideColor = selectedPiece.getPieceColor() == PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK;
+                PieceColor nextMoveSideColor = selectedPiece.getColor() == PieceColor.WHITE ? PieceColor.WHITE : PieceColor.BLACK;
                 setNextMoveSideColor(nextMoveSideColor);
                 selectedPiece = null;
                 ChessBoardUI.selectedPosition = null;
@@ -65,7 +65,7 @@ public class ChessBoard {
                 int currentFile = startingPosition.getFile();
                 for (int i = startingPosition.getRank(); i < endingPosition.getRank(); i++) {
                     Position position = startingPosition.getFile() < endingPosition.getFile() ? Position.of(i + 1, currentFile + 1) : Position.of(i + 1, currentFile - 1);
-                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getColor() == selectedPiece.getColor()) {
                         return false;
                     }
                     if (startingPosition.getFile() < endingPosition.getFile()) {
@@ -78,7 +78,7 @@ public class ChessBoard {
                 int currentFile = startingPosition.getFile();
                 for (int i = startingPosition.getRank(); i > endingPosition.getRank(); i--) {
                     Position position = startingPosition.getFile() > endingPosition.getFile() ? Position.of(i - 1, currentFile - 1) : Position.of(i - 1, currentFile + 1);
-                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getColor() == selectedPiece.getColor()) {
                         return false;
                     }
                     if (startingPosition.getFile() > endingPosition.getFile()) {
