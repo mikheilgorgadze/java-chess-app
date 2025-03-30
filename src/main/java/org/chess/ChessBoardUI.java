@@ -74,7 +74,8 @@ public class ChessBoardUI extends JPanel {
                 Position position = Position.of(rank, file);
                 String pieceName = color.name().toLowerCase() + "-" + pieceType.pieceName;
                 BufferedImage image = ResourceManager.loadImage(pieceName);
-                ChessPiece piece = ChessPiece.of(color, position, pieceType, image);
+//                ChessPiece piece = ChessPieceOld.of(color, position, pieceType, image);
+                ChessPiece piece = ChessPieceFactory.get(color, position, image, pieceName, pieceType);
                 chessBoard.addPieceAt(position, piece);
                 file++;
             } else if (Character.isDigit(c)) {
