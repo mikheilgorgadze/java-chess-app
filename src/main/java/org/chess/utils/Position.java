@@ -41,7 +41,7 @@ public class Position {
     }
 
     public static int chebyshevDistanceBetween(Position currentPosition, Position newPosition) {
-        return Math.max(Math.abs(newPosition.getRank() - currentPosition.getRank()), Math.abs(newPosition.getFile()) - currentPosition.getFile());
+        return Math.max(Math.abs(newPosition.getRank() - currentPosition.getRank()), Math.abs(newPosition.getFile() - currentPosition.getFile()));
     }
 
     private static boolean isValidPosition(int rank, int file) {
