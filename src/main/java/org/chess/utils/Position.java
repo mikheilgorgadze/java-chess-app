@@ -11,7 +11,7 @@ public class Position {
     private static final Position INVALID = new Position(-1, -1);
 
 
-    public static Position of (int rank, int file) {
+    public static Position of(int rank, int file) {
         return isValidPosition(rank, file) ? new Position(rank, file) : INVALID;
     }
 
@@ -22,10 +22,6 @@ public class Position {
 
     public boolean isValid() {
         return this != INVALID;
-    }
-
-    public static boolean isValidPosition(int rank, int file) {
-        return isValidRank(rank) && isValidFile(file);
     }
 
     public boolean isValidDiagonal(Position position) {
@@ -40,6 +36,18 @@ public class Position {
         return this.rank == position.rank;
     }
 
+    public Position offsetBy(int rankOffset, int fileOffset) {
+        return isValidPosition(this.rank + rankOffset, this.file + fileOffset) ? Position.of(this.rank + rankOffset, this.file + fileOffset) : INVALID;
+    }
+
+    public static int chebyshevDistanceBetween(Position currentPosition, Position newPosition) {
+        return Math.max(Math.abs(newPosition.getRank() - currentPosition.getRank()), Math.abs(newPosition.getFile()) - currentPosition.getFile());
+    }
+
+    private static boolean isValidPosition(int rank, int file) {
+        return isValidRank(rank) && isValidFile(file);
+    }
+
     private static boolean isValidFile(int file) {
         return file >= min_row_col && file <= max_row_col;
     }
@@ -47,6 +55,8 @@ public class Position {
     private static boolean isValidRank(int rank) {
         return rank >= min_row_col && rank <= max_row_col;
     }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,6 +69,7 @@ public class Position {
     public int hashCode() {
         return 31 * rank + file;
     }
+
     @Override
     public String toString() {
         return Character.toString(('a' + file)) + (rank + 1);
