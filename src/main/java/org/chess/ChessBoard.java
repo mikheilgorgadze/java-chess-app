@@ -58,7 +58,7 @@ public class ChessBoard {
         }
     }
 
-    public boolean isFriendlyPieceNotPresent(Position startingPosition, Position endingPosition) {
+    public boolean isFriendlyPieceNotPresentBetween(Position startingPosition, Position endingPosition) {
 
         if (startingPosition.isValidDiagonal(endingPosition)) {
             if (startingPosition.getRank() < endingPosition.getRank()) {
@@ -95,14 +95,16 @@ public class ChessBoard {
             if (startingPosition.getFile() < endingPosition.getFile()) {
                 for (int i = startingPosition.getFile(); i < endingPosition.getFile(); i++) {
                     Position position = Position.of(currentRank, i + 1);
-                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                    ChessPiece chessPiece = this.getPieceAt(position);
+                    if (chessPiece != null && chessPiece.isFriendlyPiece(selectedPiece)) {
                         return false;
                     }
                 }
             } else if (startingPosition.getFile() > endingPosition.getFile()) {
                 for (int i = startingPosition.getFile(); i > endingPosition.getFile(); i--) {
                     Position position = Position.of(currentRank, i - 1);
-                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                    ChessPiece chessPiece = this.getPieceAt(position);
+                    if (chessPiece != null && chessPiece.isFriendlyPiece(selectedPiece)) {
                         return false;
                     }
                 }
@@ -114,14 +116,16 @@ public class ChessBoard {
             if (startingPosition.getRank() < endingPosition.getRank()) {
                 for (int i = startingPosition.getRank(); i < endingPosition.getRank(); i++) {
                     Position position = Position.of(i + 1, currentFile);
-                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                    ChessPiece chessPiece = this.getPieceAt(position);
+                    if (chessPiece != null && chessPiece.isFriendlyPiece(selectedPiece)) {
                         return false;
                     }
                 }
             } else if (startingPosition.getRank() > endingPosition.getRank()) {
                 for (int i = startingPosition.getRank(); i > endingPosition.getRank(); i--) {
                     Position position = Position.of(i - 1, currentFile);
-                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                    ChessPiece chessPiece = this.getPieceAt(position);
+                    if (chessPiece != null && chessPiece.isFriendlyPiece(selectedPiece)) {
                         return false;
                     }
                 }
@@ -129,6 +133,11 @@ public class ChessBoard {
         }
 
         return true;
+    }
+
+    public boolean isFriendlyPieceOn(Position position) {
+        ChessPiece chessPiece = this.getPieceAt(position);
+        return chessPiece != null && chessPiece.isFriendlyPiece(selectedPiece);
     }
 
     private void setPieceAt( Position position) {

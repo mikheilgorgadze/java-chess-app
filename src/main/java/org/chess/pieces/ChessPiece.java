@@ -49,6 +49,12 @@ public class ChessPiece {
                 case ROOK -> {
                     return isRookMoveValid(this.position, newPosition, chessBoard);
                 }
+                case KNIGHT -> {
+                    return isKnightMoveValid(this.position, newPosition, chessBoard);
+                }
+                case KING -> {
+                    return isKingMoveValid(this.position, newPosition, chessBoard);
+                }
                 default -> {
                     return false;
                 }
@@ -90,18 +96,33 @@ public class ChessPiece {
         return result;
     }
 
+    public boolean isFriendlyPiece(ChessPiece piece) {
+        return this.pieceColor == piece.pieceColor;
+    }
+
     private boolean isBishopMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
-        return startingPosition.isValidDiagonal(endPosition) && chessBoard.isFriendlyPieceNotPresent(startingPosition, endPosition);
+        return startingPosition.isValidDiagonal(endPosition) && chessBoard.isFriendlyPieceNotPresentBetween(startingPosition, endPosition);
     }
 
     private boolean isQueenMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
         return (startingPosition.isValidDiagonal(endPosition) || startingPosition.isValidVertical(endPosition) || startingPosition.isValidHorizontal(endPosition))
-                && chessBoard.isFriendlyPieceNotPresent(startingPosition, endPosition);
+                && chessBoard.isFriendlyPieceNotPresentBetween(startingPosition, endPosition);
     }
 
     private boolean isRookMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
         return (startingPosition.isValidVertical(endPosition) || startingPosition.isValidHorizontal(endPosition))
-                && chessBoard.isFriendlyPieceNotPresent(startingPosition, endPosition);
+                && chessBoard.isFriendlyPieceNotPresentBetween(startingPosition, endPosition);
+    }
+
+    private boolean isKnightMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
+        return (Math.abs(startingPosition.getRank() - endPosition.getRank()) == 1 && Math.abs(startingPosition.getFile() - endPosition.getFile()) == 2) ||
+                (Math.abs(startingPosition.getRank() - endPosition.getRank()) == 2 && Math.abs(startingPosition.getFile() - endPosition.getFile()) == 1) && !chessBoard.isFriendlyPieceOn(endPosition);
+    }
+
+    private boolean isKingMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
+        return (startingPosition.isValidDiagonal(endPosition) || startingPosition.isValidVertical(endPosition) || startingPosition.isValidHorizontal(endPosition))
+                && Position.chebyshevDistanceBetween(startingPosition, endPosition) == 1
+                && chessBoard.isFriendlyPieceNotPresentBetween(startingPosition, endPosition);
     }
 
 
