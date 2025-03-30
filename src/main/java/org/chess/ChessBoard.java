@@ -37,7 +37,7 @@ public class ChessBoard {
     }
 
     public void moveSelectedPieceTo(Position newPosition) {
-        if (selectedPiece != null && selectedPiece.isValidMove(newPosition, this)) {
+        if (selectedPiece != null && selectedPiece.getColor() != this.nextMoveSideColor && selectedPiece.isValidMove(newPosition, this)) {
             selectedPiece.setMoved(!newPosition.equals(selectedPosition));
             if (selectedPiece.isMoved()) {
                 setPieceAt(newPosition);
