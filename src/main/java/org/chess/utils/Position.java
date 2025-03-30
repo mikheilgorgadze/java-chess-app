@@ -28,6 +28,18 @@ public class Position {
         return isValidRank(rank) && isValidFile(file);
     }
 
+    public boolean isValidDiagonal(Position position) {
+        return Math.abs(this.rank - position.rank) == Math.abs(this.file - position.file);
+    }
+
+    public boolean isValidVertical(Position position) {
+        return this.file == position.file;
+    }
+
+    public boolean isValidHorizontal(Position position) {
+        return this.rank == position.rank;
+    }
+
     private static boolean isValidFile(int file) {
         return file >= min_row_col && file <= max_row_col;
     }

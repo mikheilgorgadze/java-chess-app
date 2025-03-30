@@ -58,6 +58,79 @@ public class ChessBoard {
         }
     }
 
+    public boolean isFriendlyPieceNotPresent(Position startingPosition, Position endingPosition) {
+
+        if (startingPosition.isValidDiagonal(endingPosition)) {
+            if (startingPosition.getRank() < endingPosition.getRank()) {
+                int currentFile = startingPosition.getFile();
+                for (int i = startingPosition.getRank(); i < endingPosition.getRank(); i++) {
+                    Position position = startingPosition.getFile() < endingPosition.getFile() ? Position.of(i + 1, currentFile + 1) : Position.of(i + 1, currentFile - 1);
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                        return false;
+                    }
+                    if (startingPosition.getFile() < endingPosition.getFile()) {
+                        currentFile ++;
+                    } else {
+                        currentFile --;
+                    }
+                }
+            } else if (startingPosition.getRank() > endingPosition.getRank()) {
+                int currentFile = startingPosition.getFile();
+                for (int i = startingPosition.getRank(); i > endingPosition.getRank(); i--) {
+                    Position position = startingPosition.getFile() > endingPosition.getFile() ? Position.of(i - 1, currentFile - 1) : Position.of(i - 1, currentFile + 1);
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                        return false;
+                    }
+                    if (startingPosition.getFile() > endingPosition.getFile()) {
+                        currentFile --;
+                    } else {
+                        currentFile ++;
+                    }
+                }
+            }
+        }
+
+        if (startingPosition.isValidHorizontal(endingPosition)) {
+            int currentRank = startingPosition.getRank();
+            if (startingPosition.getFile() < endingPosition.getFile()) {
+                for (int i = startingPosition.getFile(); i < endingPosition.getFile(); i++) {
+                    Position position = Position.of(currentRank, i + 1);
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                        return false;
+                    }
+                }
+            } else if (startingPosition.getFile() > endingPosition.getFile()) {
+                for (int i = startingPosition.getFile(); i > endingPosition.getFile(); i--) {
+                    Position position = Position.of(currentRank, i - 1);
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        if (startingPosition.isValidVertical(endingPosition)) {
+            int currentFile = startingPosition.getFile();
+            if (startingPosition.getRank() < endingPosition.getRank()) {
+                for (int i = startingPosition.getRank(); i < endingPosition.getRank(); i++) {
+                    Position position = Position.of(i + 1, currentFile);
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                        return false;
+                    }
+                }
+            } else if (startingPosition.getRank() > endingPosition.getRank()) {
+                for (int i = startingPosition.getRank(); i > endingPosition.getRank(); i--) {
+                    Position position = Position.of(i - 1, currentFile);
+                    if (this.getPieceAt(position) != null && this.getPieceAt(position).getPieceColor() == selectedPiece.getPieceColor()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     private void setPieceAt( Position position) {
         selectedPiece.setPosition(position);
         this.removePieceFrom(selectedPosition);

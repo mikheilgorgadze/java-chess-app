@@ -7,7 +7,6 @@ import org.chess.utils.PieceColor;
 import org.chess.utils.Position;
 
 import java.awt.image.BufferedImage;
-import java.util.Map;
 
 @Getter
 public class ChessPiece {
@@ -26,7 +25,7 @@ public class ChessPiece {
         this.image = image;
     }
 
-    public static ChessPiece of (PieceColor pieceColor, Position position, ChessPieceType pieceType, BufferedImage image) {
+    public static ChessPiece of(PieceColor pieceColor, Position position, ChessPieceType pieceType, BufferedImage image) {
         return new ChessPiece(pieceColor, position, pieceType, image);
     }
 
@@ -43,6 +42,12 @@ public class ChessPiece {
                 }
                 case BISHOP -> {
                     return isBishopMoveValid(this.position, newPosition, chessBoard);
+                }
+                case QUEEN -> {
+                    return isQueenMoveValid(this.position, newPosition, chessBoard);
+                }
+                case ROOK -> {
+                    return isRookMoveValid(this.position, newPosition, chessBoard);
                 }
                 default -> {
                     return false;
@@ -85,32 +90,20 @@ public class ChessPiece {
         return result;
     }
 
-    private boolean isBishopMoveValid(Position currentPosition, Position newPosition, ChessBoard chessBoard) {
-        boolean result = false;
-        int currentRank = currentPosition.getRank();
-        int currentFile = currentPosition.getFile();
-        int newRank = newPosition.getRank();
-        int newFile = newPosition.getFile();
-
-        if (Math.abs(newRank - currentRank) == Math.abs(newFile - currentFile)) {
-            boolean found = false;
-            for (int i = 1; i <= Math.abs(newRank - currentRank); i++) {
-                ChessPiece currentPiece = chessBoard.getPieceAt(Position.of(currentRank + i, currentFile + i));
-                if (currentPiece != null) {
-                    found = true;
-                    if (currentPiece.pieceColor == this.pieceColor) {
-                        return false;
-                    }
-                }
-            }
-            result = !found;
-        }
-        return result;
+    private boolean isBishopMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
+        return startingPosition.isValidDiagonal(endPosition) && chessBoard.isFriendlyPieceNotPresent(startingPosition, endPosition);
     }
 
-    private boolean isPiecePresentOnLine(Position startingPosition, Position endingPosition) {
-        return false;
+    private boolean isQueenMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
+        return (startingPosition.isValidDiagonal(endPosition) || startingPosition.isValidVertical(endPosition) || startingPosition.isValidHorizontal(endPosition))
+                && chessBoard.isFriendlyPieceNotPresent(startingPosition, endPosition);
     }
+
+    private boolean isRookMoveValid(Position startingPosition, Position endPosition, ChessBoard chessBoard) {
+        return (startingPosition.isValidVertical(endPosition) || startingPosition.isValidHorizontal(endPosition))
+                && chessBoard.isFriendlyPieceNotPresent(startingPosition, endPosition);
+    }
+
 
     @Override
     public String toString() {
